@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Foodie AI Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="chat-container">
+
+    <div class="header">
+        <h1>🍴 Foodie AI</h1>
+        <p>Your Smart Recipe & Food Assistant</p>
+    </div>
+
+    <div id="chat-box" class="chat-box">
+
+        <div class="bot-message">
+            👨‍🍳 Hello! Ask me for recipes, cooking tips, healthy meals, or ingredient suggestions.
+        </div>
+
+    </div>
+
+    <div class="input-container">
+        <input
+            type="text"
+            id="user-input"
+            placeholder="Ask for recipes..."
+            onkeypress="if(event.key==='Enter') sendMessage()"
+        >
+        <button onclick="sendMessage()">➤</button>
+    </div>
+
+</div>
+
+<script>
+async function sendMessage() {
+
+    let input = document.getElementById("user-input");
+    let message = input.value.trim();
+
+    if(message === "") return;
+
+    let chatBox = document.getElementById("chat-box");
+
+    chatBox.innerHTML += `
+        <div class="user-message">${message}</div>
+    `;
+
+    input.value = "";
+
+    chatBox.innerHTML += `
+        <div class="bot-message" id="loading">
+            Thinking...
+        </div>
+    `;
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    const response = await fetch("/chat", {
+        method: "POST",
+        headers: {
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            message: message
+        })
+    });
+
+    const data = await response.json();
+
+    document.getElementById("loading").remove();
+
+    chatBox.innerHTML += `
+        <div class="bot-message">${data.reply}</div>
+    `;
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+</script>
+
+</body>
+</html>
